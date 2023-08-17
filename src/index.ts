@@ -60,7 +60,6 @@ export function getUser(id: string): Result<User, string> {
 
 $update;
 export function deleteUser(id: string): Result< User, string> {
-    let user = users.get(id);
     return match(users.remove(id), {
         Some: (deletedUser) => {
             // Remove antiques of the associated user
