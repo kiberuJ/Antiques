@@ -59,32 +59,48 @@ export function deleteUser(id: string): Result< User, string> {
     let user = users.get(id);
     return match(users.remove(id), {
         Some: (deletedUser) => Result.Ok<User, string>(deletedUser),
-        None: () => Result.Err<User, string>(`Couldn't delete a user with the specidied id`)
+        None: () => Result.Err<User, string>(`Couldn't delete a user with the specified id`)
     });
 }
 
 $update;
 export function addAntique(payload: AntiquePayload): Result<Antique, string> {
     const user = users.get(payload.userId);
-    return match(user, {
-        Some: (user) => {
-            const antique: Antique = {
-                id: uuidv4(),
-                createdAt: ic.time(),
-                ...payload
-            };
-            antiques.insert(antique.id, antique);
-            const updatedUser: User = {
-                ...user,
-                antiquesIds: [...user.antiquesIds, antique.id]
-            }
-            users.insert(updatedUser.id, updatedUser);
+    
+    if (!user) {
+        return Result.Err<Antique, string>(`Couldn't find the user who created the antique`);
+    }
 
-            return Result.Ok<Antique, string>(antique);
-        },
-        None: () => Result.Err<Antique, string>(`Couldn't delete a user with the specidied id`)
-    });
+    const antique: Antique = {
+        id: uuidv4(),
+        createdAt: ic.time(),
+        ...payload
+    };
+
+    // Validate that the user ID provided in the payload is valid
+    if (!isValidUserId(payload.userId)) {
+        return Result.Err<Antique, string>(`Invalid user ID provided`);
+    }
+
+    // Insert the antique into the antiques map
+    if (antiques.insert(antique.id, antique)) {
+        const updatedUser: User = {
+            ...user,
+            antiquesIds: [...user.antiquesIds, antique.id]
+        };
+        users.insert(updatedUser.id, updatedUser);
+
+        return Result.Ok<Antique, string>(antique);
+    } else {
+        return Result.Err<Antique, string>(`Failed to insert the antique`);
+    }
 }
+
+function isValidUserId(userId: string): boolean {
+    const user = users.get(userId);
+    return !!user;
+}
+
 
 $query;
 export function getAntiques(): Vec<Antique> {
@@ -93,7 +109,12 @@ export function getAntiques(): Vec<Antique> {
 
 $query;
 export function getAntique(id: string): Opt<Antique> {
-    return antiques.get(id);
+  const antique = antiques.get(id);
+  return match(antique, {
+      Some: (antique) => Opt.Some<Antique>(antique),
+      None: () => Opt.None<Antique>()
+  });
+
 }
 
 $update;
@@ -107,6 +128,7 @@ export function removeAntique(id: string): Result<Antique, string>{
         // Remove antique to be deleted from antiquesIds vector of the user record
         return match(user, {
             Some: (user) => {
+              antiques.remove(id);
                 const updatedUser: User = {
                     ...user,
                     antiquesIds: user.antiquesIds.filter(
@@ -114,7 +136,7 @@ export function removeAntique(id: string): Result<Antique, string>{
                     )
                 };
                 users.insert(updatedUser.id, updatedUser);
-                antiques.remove(id);
+                
                 return Result.Ok<Antique, string>(antique)
             },
             None: () => Result.Err<Antique, string>(`Cannot get user who created the Antique!`)
@@ -133,5 +155,4 @@ globalThis.crypto = {
     return array;
 }
 }
-
 
