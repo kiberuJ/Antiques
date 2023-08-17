@@ -50,7 +50,7 @@ dfx deploy
 
 ## :arrow_forward: Usage
 
-After successful deployement on the local Internet Computer, one can be able to interact with the canister using the terminal by invoking `dfx call methodName(params)`` commands or through the provided candid interface.
+After successful deployement on the local Internet Computer, one can be able to interact with the canister using the terminal by invoking `dfx call canisterName methodName(params)` commands or through the provided candid interface.
 
 ## :busts_in_silhouette: Authors
 
