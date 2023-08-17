@@ -50,8 +50,12 @@ export function getUsers(): Vec<User> {
 }
 
 $query
-export function getUser(id: string): Opt<User> {
-    return users.get(id);
+export function getUser(id: string): Result<User, string> {
+    const user = users.get(id);
+    return match(user, {
+        Some: (user) => Result.Ok<User, string>(user),
+        None: () => Result.Err<User, string>("Couldn't find user with the specified id!")
+    })
 }
 
 $update;
@@ -59,7 +63,7 @@ export function deleteUser(id: string): Result< User, string> {
     let user = users.get(id);
     return match(users.remove(id), {
         Some: (deletedUser) => Result.Ok<User, string>(deletedUser),
-        None: () => Result.Err<User, string>(`Couldn't delete a user with the specidied id`)
+        None: () => Result.Err<User, string>(`Couldn't delete a user with the specified id`)
     });
 }
 
@@ -86,14 +90,20 @@ export function addAntique(payload: AntiquePayload): Result<Antique, string> {
     });
 }
 
+
 $query;
 export function getAntiques(): Vec<Antique> {
     return antiques.values();
 }
 
 $query;
-export function getAntique(id: string): Opt<Antique> {
-    return antiques.get(id);
+export function getAntique(id: string): Result<Antique, string> {
+  const antique = antiques.get(id);
+  return match(antique, {
+      Some: (antique) => Result.Ok<Antique, string>(antique),
+      None: () => Result.Err<Antique, string>("Couldn't find antique with the specified id!")
+  });
+
 }
 
 $update;
@@ -107,6 +117,7 @@ export function removeAntique(id: string): Result<Antique, string>{
         // Remove antique to be deleted from antiquesIds vector of the user record
         return match(user, {
             Some: (user) => {
+              antiques.remove(id);
                 const updatedUser: User = {
                     ...user,
                     antiquesIds: user.antiquesIds.filter(
@@ -114,7 +125,7 @@ export function removeAntique(id: string): Result<Antique, string>{
                     )
                 };
                 users.insert(updatedUser.id, updatedUser);
-                antiques.remove(id);
+                
                 return Result.Ok<Antique, string>(antique)
             },
             None: () => Result.Err<Antique, string>(`Cannot get user who created the Antique!`)
