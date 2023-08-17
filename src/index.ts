@@ -61,8 +61,17 @@ export function getUser(id: string): Result<User, string> {
 $update;
 export function deleteUser(id: string): Result< User, string> {
     let user = users.get(id);
-    return match(users.remove(id), {
-        Some: (deletedUser) => Result.Ok<User, string>(deletedUser),
+    return match(user, {
+        Some: (user) => {
+            // Remove antiques of the associated user
+            user.antiquesIds.forEach(antiqueId => {
+                antiques.remove(antiqueId);
+            })
+
+            // Remove user
+            users.remove(user.id);
+            return Result.Ok<User, string>(user)
+        },
         None: () => Result.Err<User, string>(`Couldn't delete a user with the specified id`)
     });
 }
