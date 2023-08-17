@@ -1,0 +1,33 @@
+type Antique = record {
+  id : text;
+  attachmentURL : text;
+  title : text;
+  body : text;
+  userId : text;
+  createdAt : nat64;
+};
+type AntiquePayload = record {
+  attachmentURL : text;
+  title : text;
+  body : text;
+  userId : text;
+};
+type User = record {
+  id : text;
+  antiquesIds : vec text;
+  username : text;
+  createdAt : nat64;
+};
+type UserPayload = record { username : text };
+type _AzleResult = variant { Ok : Antique; Err : text };
+type _AzleResult_1 = variant { Ok : User; Err : text };
+service : () -> {
+  addAntique : (AntiquePayload) -> (_AzleResult);
+  createUser : (UserPayload) -> (User);
+  deleteUser : (text) -> (_AzleResult_1);
+  getAntique : (text) -> (opt Antique) query;
+  getAntiques : () -> (vec Antique) query;
+  getUser : (text) -> (opt User) query;
+  getUsers : () -> (vec User) query;
+  removeAntique : (text) -> (_AzleResult);
+}
