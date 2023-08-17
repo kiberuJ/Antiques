@@ -66,7 +66,6 @@ export function deleteUser(id: string): Result< User, string> {
             deletedUser.antiquesIds.forEach(antiqueId => {
                 antiques.remove(antiqueId);
             })
-
             return Result.Ok<User, string>(deletedUser)
         },
         None: () => Result.Err<User, string>(`Couldn't delete a user with the specified id`)
@@ -119,7 +118,6 @@ export function removeAntique(id: string): Result<Antique, string>{
     return match(antique, {
       Some: (antique) => {
         const user = users.get(antique.userId);
-        
         // Remove antique to be deleted from antiquesIds vector of the user record
         return match(user, {
             Some: (user) => {
