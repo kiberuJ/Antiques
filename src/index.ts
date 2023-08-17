@@ -91,7 +91,7 @@ export function addAntique(payload: AntiquePayload): Result<Antique, string> {
 
             return Result.Ok<Antique, string>(antique);
         },
-        None: () => Result.Err<Antique, string>(`Couldn't find a user with the specidied id`)
+        None: () => Result.Err<Antique, string>(`Couldn't find a user with the specified id`)
     });
 }
 
