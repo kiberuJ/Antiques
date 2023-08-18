@@ -25,9 +25,9 @@ service : () -> {
   addAntique : (AntiquePayload) -> (_AzleResult);
   createUser : (UserPayload) -> (User);
   deleteUser : (text) -> (_AzleResult_1);
-  getAntique : (text) -> (opt Antique) query;
+  getAntique : (text) -> (_AzleResult) query;
   getAntiques : () -> (vec Antique) query;
-  getUser : (text) -> (opt User) query;
+  getUser : (text) -> (_AzleResult_1) query;
   getUsers : () -> (vec User) query;
   removeAntique : (text) -> (_AzleResult);
 }
