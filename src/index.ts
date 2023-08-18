@@ -114,7 +114,6 @@ export function getAntique(id: string): Result<Antique, string> {
 $update;
 export function removeAntique(id: string): Result<Antique, string>{
     const antique = antiques.get(id);
-
     return match(antique, {
       Some: (antique) => {
         const user = users.get(antique.userId);
