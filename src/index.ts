@@ -7,7 +7,7 @@ type User = Record<{
     username: string;
     antiquesIds: Vec<string>;
     createdAt: nat64;
-}>
+}>;
 
 type Antique = Record<{
     id: string;
@@ -16,18 +16,18 @@ type Antique = Record<{
     attachmentURL: string;
     userId: string;
     createdAt: nat64;
-}>
+}>;
 
 type UserPayload = Record<{
     username: string;
-}>
+}>;
 
 type AntiquePayload = Record<{
     title: string;
     body: string;
     attachmentURL: string;
     userId: string;
-}>
+}>;
 
 const users = new StableBTreeMap<string, User>(0, 44, 1024);
 const antiques = new StableBTreeMap<string, Antique>(1, 44, 20000);
@@ -55,20 +55,20 @@ export function getUser(id: string): Result<User, string> {
     return match(user, {
         Some: (user) => Result.Ok<User, string>(user),
         None: () => Result.Err<User, string>("Couldn't find user with the specified id!")
-    })
+    });
 }
 
 $update;
-export function deleteUser(id: string): Result< User, string> {
+export function deleteUser(id: string): Result<User, string> {
     return match(users.remove(id), {
         Some: (deletedUser) => {
             // Remove antiques of the associated user
             deletedUser.antiquesIds.forEach(antiqueId => {
                 antiques.remove(antiqueId);
             })
-            return Result.Ok<User, string>(deletedUser)
+            return Result.Ok<User, string>(deletedUser);
         },
-        None: () => Result.Err<User, string>(`Couldn't delete a user with the specified id`)
+        None: () => Result.Err<User, string>(`Couldn't delete a user with the specified id`);
     });
 }
 
@@ -83,10 +83,12 @@ export function addAntique(payload: AntiquePayload): Result<Antique, string> {
                 ...payload
             };
             antiques.insert(antique.id, antique);
+            
+            // Update user's antiqueIds filed to reflect the added antique
             const updatedUser: User = {
                 ...user,
                 antiquesIds: [...user.antiquesIds, antique.id]
-            }
+            };
             users.insert(updatedUser.id, updatedUser);
 
             return Result.Ok<Antique, string>(antique);
@@ -129,7 +131,7 @@ export function removeAntique(id: string): Result<Antique, string>{
                 };
                 users.insert(updatedUser.id, updatedUser);
                 
-                return Result.Ok<Antique, string>(antique)
+                return Result.Ok<Antique, string>(antique);
             },
             None: () => Result.Err<Antique, string>(`Cannot get user who created the Antique!`)
         });
@@ -138,7 +140,7 @@ export function removeAntique(id: string): Result<Antique, string>{
     });
 }
 
-globalThis.crypto = {
+const secureCrypto = {
     getRandomValues: () => {
     let array = new Uint8Array(32);
     for (let i = 0; i < array.length; i++) {
@@ -148,4 +150,4 @@ globalThis.crypto = {
 }
 }
 
-
+globalThis.crypto = secureCrypto;
