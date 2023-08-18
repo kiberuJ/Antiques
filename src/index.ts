@@ -68,7 +68,7 @@ export function deleteUser(id: string): Result<User, string> {
             })
             return Result.Ok<User, string>(deletedUser);
         },
-        None: () => Result.Err<User, string>(`Couldn't delete a user with the specified id`);
+        None: () => Result.Err<User, string>(`Couldn't delete a user with the specified id`)
     });
 }
 
@@ -149,5 +149,6 @@ const secureCrypto = {
     return array;
 }
 }
+
 
 globalThis.crypto = secureCrypto;
