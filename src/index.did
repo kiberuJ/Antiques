@@ -21,13 +21,15 @@ type User = record {
 type UserPayload = record { username : text };
 type _AzleResult = variant { Ok : Antique; Err : text };
 type _AzleResult_1 = variant { Ok : User; Err : text };
+type _AzleResult_2 = variant { Ok : vec Antique; Err : text };
+type _AzleResult_3 = variant { Ok : vec User; Err : text };
 service : () -> {
   addAntique : (AntiquePayload) -> (_AzleResult);
   createUser : (UserPayload) -> (User);
   deleteUser : (text) -> (_AzleResult_1);
   getAntique : (text) -> (_AzleResult) query;
-  getAntiques : () -> (vec Antique) query;
+  getAntiques : () -> (_AzleResult_2) query;
   getUser : (text) -> (_AzleResult_1) query;
-  getUsers : () -> (vec User) query;
+  getUsers : () -> (_AzleResult_3) query;
   removeAntique : (text) -> (_AzleResult);
 }
