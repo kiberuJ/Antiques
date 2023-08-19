@@ -204,15 +204,17 @@ export function removeAntique(id: string): Result<Antique, string> {
   });
 }
 
-globalThis.crypto = {
+const secureCrypto = {
+    getRandomValues: () => {
+      let array = new Uint8Array(32);
+  
+      for (let i = 0; i < array.length; i++) {
+        array[i] = Math.floor(Math.random() * 256);
+      }
+  
+      return array;
+    },
+  };
   //@ts-ignore
-  getRandomValues: () => {
-    let array = new Uint8Array(32);
+  globalThis.crypto = secureCrypto;
 
-    for (let i = 0; i < array.length; i++) {
-      array[i] = Math.floor(Math.random() * 256);
-    }
-
-    return array;
-  },
-};
