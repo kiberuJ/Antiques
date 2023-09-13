@@ -229,7 +229,7 @@ export function addToFavorite(payload: FavoritePayload): Opt<Favorite> {
     const user = users.containsKey(userId);
     const antique = antiques.containsKey(antiqueId);
     if(!antique || !user) {
-        throw new Error("user or doctor with the given Id does not exist");
+        throw new Error("user or antique with the given Id does not exist");
     }
 
     // Check for existing favorite
